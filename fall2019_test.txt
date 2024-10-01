@@ -1,0 +1,4 @@
+/cache/clas12/rg-b/production/recon/fall2019/torus+1/pass2/v1/dst/train/jpsi/jpsi_
+011111
+011290
+0011270
