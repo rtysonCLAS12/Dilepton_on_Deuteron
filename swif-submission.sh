@@ -89,6 +89,7 @@ $ECHO swif2 run -workflow "$WORKFLOW"
 ### Some convenient swif2 reports and reminders below
 if [ -n "$ECHO" ]; then exit 0; fi
 
+echo
 echo "-- Active SWIF workflows --------"
 echo swif2 list
 
