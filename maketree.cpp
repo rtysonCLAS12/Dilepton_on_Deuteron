@@ -49,6 +49,17 @@ bool pass_Dead_Paddle_PCAL(region_part_ptr part);
 
 void readConfig(string configFileName, string &RCDBPath, string &CCDBPath, string &treename,int &useGoldenRunsOnly);
 
+bool file_exists (const string& name) {
+  ifstream f(name.c_str());
+  if(f.good()){
+    f.close();
+    return true;
+  } else{
+    f.close();
+    return false;
+  }
+}
+
 //run with eg:
 // clas12root -b 'maketree.cpp("/cache/clas12/rg-b/production/recon/spring2019/torus-1/pass2/v0/dst/train/jpsi/jpsi_006334.hipo","config.dat","eedFS_test.root")'
 //to cat output to log file:
@@ -68,9 +79,24 @@ void maketree(string dataPath, string configFileName, string outLoc){
     }
 
     //string configFileName="config.dat";
-    string RCDBPath="",CCDBPath="",treeName="";
+    string RCDBPath_cf="",CCDBPath_cf="",treeName="";
     int useGoldenRunsOnly=0;
-    readConfig(configFileName, RCDBPath, CCDBPath, treeName,useGoldenRunsOnly);
+    readConfig(configFileName, RCDBPath_cf, CCDBPath_cf, treeName,useGoldenRunsOnly);
+
+
+    //when submitting swif jobs we'll copy the rcdb and ccdb databases to the working directory
+    //then we'll copy all of the working directory to a fam node
+    //however, when running interactively this is not done and the databases might not
+    //be in working directory in which case we use the config path to them
+    string RCDBPath="rcdb.root";
+    if(!file_exists(RCDBPath)){RCDBPath=RCDBPath_cf;}
+    string CCDBPath="ccdb.sqlite";
+    if(!file_exists(CCDBPath)){CCDBPath=CCDBPath_cf;}
+
+    cout<<"\nRCDBPath: "<<RCDBPath<<endl;
+    cout<<"CCDBPath: "<<CCDBPath<<endl;
+    cout<<"ROOT tree name: "<<treeName<<endl;
+    cout<<"Golden Runs: "<<useGoldenRunsOnly<<"\n"<<endl;
 
     clas12databases::SetCCDBLocalConnection(CCDBPath.c_str());
     clas12databases::SetRCDBRootConnection(RCDBPath.c_str());
@@ -134,6 +160,8 @@ void maketree(string dataPath, string configFileName, string outLoc){
         }
         c12.applyQA();
 
+        const TableOfDoubles_t& ccdbPhSF=c12.ccdb()->requestTableDoubles("/calibration/eb/photon_sf");
+
         //beam_energy in MeV
         float beamE=(rcdbData.beam_energy)/1000.;
         //beam won't change on run per run basis
@@ -165,9 +193,9 @@ void maketree(string dataPath, string configFileName, string outLoc){
 
                       double elPBefore=el.P();
                       double poPBefore=po.P();
-                      elRadCor(c12.ccdb()->requestTableDoubles("/calibration/eb/photon_sf"), electrons[el_combis],neutrals,el);
+                      elRadCor(ccdbPhSF, electrons[el_combis],neutrals,el);
                       double elRC=el.P()-elPBefore;
-                      elRadCor(c12.ccdb()->requestTableDoubles("/calibration/eb/photon_sf"), positrons[po_combis],neutrals,po);
+                      elRadCor(ccdbPhSF, positrons[po_combis],neutrals,po);
                       double poRC=po.P()-poPBefore;
 
                       TLorentzVector miss = beam + target - el - po - deut;
@@ -465,7 +493,6 @@ void readConfig(string configFileName, string &RCDBPath, string &CCDBPath, strin
     } else{
         cout<<"\nCannot open config file: "<<configFileName<<endl;
         cout<<"Using default settings"<<endl;
-        gap="";
     }
 
     //initialise default
@@ -491,10 +518,6 @@ void readConfig(string configFileName, string &RCDBPath, string &CCDBPath, strin
         
     }
 
-    cout<<gap<<"RCDBPath: "<<RCDBPath<<endl;
-    cout<<"CCDBPath: "<<CCDBPath<<endl;
-    cout<<"ROOT tree name: "<<treename<<endl;
-    cout<<"Golden Runs: "<<useGoldenRunsOnly<<"\n"<<endl;
 }
 
 void initNames(string* varNames){

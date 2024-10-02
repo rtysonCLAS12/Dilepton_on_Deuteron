@@ -7,12 +7,16 @@ CONFIG_FILE_FO="${SRCDIR}/config.dat"
 DESTDIR=$(grep '^OutPath' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
 RunLists=$(grep '^RunLists' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
 TREENM=$(grep '^treename' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
+RCDBPath=$(grep '^RCDBPath' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
+CCDBPath=$(grep '^CCDBPath' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
 
 echo
 echo "SourceCodePath: $SRCDIR"
 echo "OutPath: $DESTDIR"
 echo "RunLists: $RunLists"
 echo "TreeName: $TREENM"
+echo "RCDBPath: $RCDBPath"
+echo "CCDBPath: $CCDBPath"
 
 # - Use *your* slurm account
 #   Find your name here: https://scicomp.jlab.org/scicomp/slurmJob/slurmAccount
@@ -27,6 +31,11 @@ ECHO="echo"   ## Used to echo swif commands for testing
 if [ ${1:-unset} == "submit" ]; then
   ECHO=""  ## disables the 'echo' and actually runs the swif commands
 fi
+
+echo
+echo "Copy rcdb and ccdb databases to source directory"
+cp "$RCDBPath" "${SRCDIR}/"
+cp "$CCDBPath" "${SRCDIR}/"
 
 echo
 echo "Ensure the DESTDIR ($DESTDIR) is available..."

@@ -51,7 +51,7 @@ fi
 
 echo
 echo "-- Copy your software to $PWD on the local node -------------------------------"
-rsync -avP --exclude "output/" "${SRCDIR}/" "$PWD"  # don't copy output/ dir
+rsync -avP --exclude "output/" --exclude ".git*" "${SRCDIR}/" "$PWD"  # don't copy output/ dir
 
 echo
 echo "-- Run main job -----------------------------------"

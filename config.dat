@@ -4,8 +4,8 @@ treename eed
 GoldenRuns 1
 
 #for swif submission
-OutPath /w/work/clas12/tyson/data_repo/c12scripts_out/eed/trees
-RunLists spring2019.txt fall2019.txt spring2020.txt
+OutPath /w/work/clas12/tyson/data_repo/c12scripts_out/eed/trees_test
+RunLists spring2019_test.txt fall2019_test.txt spring2020_test.txt
 
 #for concat_runs
 OutputFile /w/work/clas12/tyson/data_repo/c12scripts_out/eed/eedFS_allRGB.root

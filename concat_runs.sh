@@ -9,9 +9,15 @@ OUTPUT_FILE=$(grep '^OutputFile' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
 TREENM=$(grep '^treename' "$CONFIG_FILE_FO" | cut -d' ' -f2-)
 
 WORKFLOW="c12root-$TREENM-$USER"
+
 echo
 echo "cancel swif workflow $WORKFLOW"
 swif2 cancel -workflow "$WORKFLOW" -delete
+
+echo
+echo "Delete local RCDB and CCDB copies"
+rm rcdb.root
+rm ccdb.sqlite
 
 echo
 echo "hadd *.root from: $ROOT_DIR"
