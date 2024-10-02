@@ -19,7 +19,7 @@ TREENM=$5
 #to test this script, create new directory somewhere other than source code
 #this mimics copying working directory to farm node
 #then use command:
-#./job-script.sh /cache/clas12/rg-b/production/recon/spring2019/torus-1/pass2/v0/dst/train/jpsi/jpsi_006334.hipo 006334 config.dat eed
+#/path/to/source/directoy/job-script.sh /path/to/source/directoy/ /cache/clas12/rg-b/production/recon/spring2019/torus-1/pass2/v0/dst/train/jpsi/jpsi_006334.hipo 006334 config.dat eed
 
 #set -x   ## Dump all commands to stderr for extra debugging info
 set -e   ## Set bash to die on errors (better this then waste time on a broken job!)
@@ -51,7 +51,7 @@ fi
 
 echo
 echo "-- Copy your software to $PWD on the local node -------------------------------"
-rsync -avP --exclude "output/" --exclude ".git*" "${SRCDIR}/" "$PWD"  # don't copy output/ dir
+rsync -avP --exclude "output/" --exclude ".git*" "${SRCDIR}/" "$PWD"  # don't copy output/ dir or git stuff
 
 echo
 echo "-- Run main job -----------------------------------"
@@ -59,8 +59,7 @@ set +e   # we'll disable 'killing the shell on errors' from here on
 
 # NOTE: Be mindful that any output files *must* have a unique name, or they will
 #       step on each other when you run multiple jobs.
-#       This bit will use the SWIF_JOB_ATTEMPT_ID if available, or attache a random
-#       'testing-PID' suffix (ie. if you're running this manually).
+#       Here we rename the output based on the run number passed as input
 
 OUTPUTFILE="${TREENM}_${RUNNB}.root"
 LOGFILE="${TREENM}_${RUNNB}.log"

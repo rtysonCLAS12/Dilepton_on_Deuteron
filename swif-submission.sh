@@ -39,7 +39,7 @@ cp "$CCDBPath" "${SRCDIR}/"
 
 echo
 echo "Ensure the DESTDIR ($DESTDIR) is available..."
-#mkdir -p "$DESTDIR"  ## this will exit and die if the dir doesn't exist and can't be created
+mkdir -p "$DESTDIR"  ## this will exit and die if the dir doesn't exist and can't be created
 
 #Jobs will use local copy of config file in source directory
 #just need global path to set up swif jobs
@@ -62,6 +62,7 @@ for runlist_file in $RunLists; do
 
       #get path to hipo file
       hipo_file_path="${path}${run_number}.hipo"
+      #create swif job
       $ECHO \
       swif2 add-job \
         -create \
@@ -82,6 +83,7 @@ done
 # Wait for one minute
 sleep 60
 
+# run the swif jobs
 $ECHO swif2 run -workflow "$WORKFLOW"
 
 ### Some convenient swif2 reports and reminders below
