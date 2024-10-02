@@ -40,6 +40,7 @@ cp "$CCDBPath" "${SRCDIR}/"
 echo
 echo "Ensure the DESTDIR ($DESTDIR) is available..."
 mkdir -p "$DESTDIR"  ## this will exit and die if the dir doesn't exist and can't be created
+echo
 
 #Jobs will use local copy of config file in source directory
 #just need global path to set up swif jobs
