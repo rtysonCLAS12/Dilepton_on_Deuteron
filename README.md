@@ -5,9 +5,10 @@ Code for the analysis of dilepton production on the deuteron at CLAS12
 
 The script is called *maketree.cpp*. The goal of this script is to process CLAS12 data and produce an output ROOT tree with relevant variables for the events we are interested in: e d -> e+ e- d.
 
-The script uses [clas12root](https://github.com/JeffersonLab/clas12root/tree/master) and its wrappers to the [RCDB](https://github.com/JeffersonLab/rcdb), [CCDB](https://github.com/JeffersonLab/ccdb), and QADB. clas12root is installed with all dependencies on ifarm and can be accessed using modules. An example on how to set up the right environment can be found on lines 27-45 of the ***job-script.sh***. clas12root uses downloaded local copies of the RCDB and CCDB databases, please refer to the [documentation](https://github.com/JeffersonLab/clas12root/tree/master?tab=readme-ov-file#clas12databases) on how to set these up for clas12root using the [PrepareDatabases.C script](https://github.com/JeffersonLab/clas12root/blob/master/RunRoot/PrepareDatabases.C).
+The script uses [clas12root](https://github.com/JeffersonLab/clas12root/tree/master) and its wrappers to the [RCDB](https://github.com/JeffersonLab/rcdb), [CCDB](https://github.com/JeffersonLab/ccdb), and QADB. clas12root is installed with all dependencies on ifarm and can be accessed using modules. An example on how to set up the right environment can be found on lines [27](https://github.com/rtysonCLAS12/Dilepton_on_Deuteron/blob/8436bbcbfa272b3ad089062d78a2336c3ec65be1/job-script.sh#L27)-[45](https://github.com/rtysonCLAS12/Dilepton_on_Deuteron/blob/8436bbcbfa272b3ad089062d78a2336c3ec65be1/job-script.sh#L45) of the ***job-script.sh***. clas12root uses downloaded local copies of the RCDB and CCDB databases, please refer to the [documentation](https://github.com/JeffersonLab/clas12root/tree/master?tab=readme-ov-file#clas12databases) on how to set these up for clas12root using the [PrepareDatabases.C script](https://github.com/JeffersonLab/clas12root/blob/master/RunRoot/PrepareDatabases.C).
 
-The *maketree.cpp* script uses the config.dat config file to set the paths to the local copies of the RCDB and CCDB prepared as discussed in the documentation. Note that there is a default that points to [my](mailto:tyson@jlab.org) copies, but these might disappear or change over time. Best to have your own. The other two config options are the name of the root tree and whether or not to only use golden runs. Golden runs are based on the Quality Assurance which selects runs where the accumulated charge should be well calculated. The QADB is also used to calculate the charge, this will be printed to screen or to a log file (see below).
+The *maketree.cpp* script uses the *config.dat* config file to set the paths to the local copies of the RCDB and CCDB prepared as discussed in the previous paragraph. Note that there is a default that points to [my](mailto:tyson@jlab.org) copies, but these might disappear or change over time. Best to have your own. The other two config options are the name of the root tree and whether or not to only use golden runs. Golden runs are based on the Quality Assurance which selects runs where the accumulated charge should be well calculated. The QADB is also used to calculate the charge, this will be printed to screen or to a log file (see below).
+
 ***N.B.:*** The database files are copied to the source directory when submitting jobs on the farm, this is to avoid reading from /work too many times. When running interactively, the database files will be opened from the path specified in the config.dat file unless the databases already exist in the working directory.
 
 The point of the *maketree.cpp* script is to produce an output ROOT tree with relevant variables for the events we are interested in. The script already has a bunch of useful variables added to the output. More can be added by doing three things. First, scrolling to the bottom of the script, the function [*void initNames(string * varNames)*](https://github.com/rtysonCLAS12/Dilepton_on_Deuteron/blob/797f0f9ea2b9661317a172492bf3d100bb3232b0/maketree.cpp#L500) creates a list of variable names to be added to the tree. You can add more variables to this list. Scrolling back up to the top of the script, the [*int nVars*](https://github.com/rtysonCLAS12/Dilepton_on_Deuteron/blob/797f0f9ea2b9661317a172492bf3d100bb3232b0/maketree.cpp#L85) variable should be changed to be the same length as the list of variables. Scrolling to the middle of the script is where the branches of the tree are filled with the value corresponding to a variable. For example:
@@ -16,11 +17,11 @@ The point of the *maketree.cpp* script is to produce an output ROOT tree with re
 
 [fills the branch called elP with the electron momentum](https://github.com/rtysonCLAS12/Dilepton_on_Deuteron/blob/797f0f9ea2b9661317a172492bf3d100bb3232b0/maketree.cpp#L206). Variables corresponding to an electron start with el, those for the positron start with po and those for the deuteron start with deut. Information on accessing bank variables in clas12root is available [here](https://github.com/JeffersonLab/clas12root/blob/master/AccesssingBankDataInCpp.txt), with a description of these variables [here](https://clasweb.jlab.org/wiki/index.php/CLAS12_DSTs). Some variables correspond to an event, eg the invariant mass of the e+ e- pair, or the missing mass of e d -> e+ e- d. The run and event number are also recorded.
 
-The script will iterate over runs one by one, see below on how to run the script. It will read the beam energy from the RCDB so this does not need to be modified. The RCDB also contains information on e.g. the torus polarity.
+The script will iterate over runs passed to the script one by one, see below on how to run the script. When running on the farm, one job will pass one run to the script so that many runs can be processed in parallel. The script will read the beam energy from the RCDB so this does not need to be modified. The RCDB also contains information on e.g. the torus polarity.
 
 The script then iterates over all events in a run. The only requirements on these events is that they have at least one electron, one positron and one deuteron as IDed by the [CLAS12 event builder](https://www.sciencedirect.com/science/article/pii/S0168900220300784). The script will take all posible combitorials ie combinations of electrons, positrons and deuterons. That is to say, if they are more than one of each particle type, the code will consider all possible combinations. A flag Combis is used to show which combination an entry corresponds to (ie Combis=0 means first combination in an event). The first electron will be the trigger electron, the first positron and deuteron should be the highest momentum particles, so it's probably safe to use Combis=0 as a starting point, although ultimately some selection algorithm should be implemented.  
 
-The code applies corrections to the electron and positron that radiate photons when going through detector material between the target and detector. These photons can be identified by the fact that they have a small polar angular difference with the electron. The momentum of the photon is added back to the electron or positron. The script also creates a branch containing a flag *elTriangCut* or *poTriangCut* which corresponds to electrons or positrons that pass a useful cut to remove pion contamination. See [Section 6.3 of my thesis](https://www.jlab.org/Hall-B/general/thesis/RTyson_thesis.pdf) for more details on the correction and cut. Finally the script also creates a branch containing a flag *elPassDeadPaddlePCAL* or *poPassDeadPaddlePCAL* which corresponds to whether electrons or positrons hit paddles in the ECAL that were identified as having a low efficiency. Its good to remove these for better matching between data and simulation.
+The code applies corrections to the electrons and positrons that radiate photons when going through detector material between the target and detector. These photons can be identified by the fact that they have a small polar angular difference with the electron. The momentum of the photon is added back to the electron or positron. The script also creates a branch containing a flag *elTriangCut* or *poTriangCut* which corresponds to electrons or positrons that pass a useful cut to remove pion contamination. See [Section 6.3 of my thesis](https://www.jlab.org/Hall-B/general/thesis/RTyson_thesis.pdf) for more details on the correction and cut. Finally the script also creates a branch containing a flag *elPassDeadPaddlePCAL* or *poPassDeadPaddlePCAL* which corresponds to whether electrons or positrons hit paddles in the ECAL that were identified as having a low efficiency. Its good to remove these for better matching between data and simulation.
 
 
 ***N.B.:*** The clas12root script can be run interactively with e.g.: 
@@ -41,7 +42,7 @@ This code should be updated with [Iguana](https://github.com/JeffersonLab/iguana
 
 ## Plotting script
 
-A script to plot some of the key variables has been included as an example and for convenience to check that the code runs correctly. The script produces one pdf with one plot per page, run it with ROOT. You'll need to change two things:
+A script to plot some of the key variables has been included as an example and for convenience to check that the code runs correctly. The script produces one pdf with one plot per page. Run the script in ROOT. You'll need to change two things:
 
 The treeLocRoot on line 27 should be the path to the output tree produced by the clas12root script.
 
@@ -54,9 +55,9 @@ You can further change cuts based on the variables in the trees by changing the 
 Two scripts are used to submit jobs on the JLab farm using swif2. Hopefully you won't need to change these much more than what is indicated below. One final script is used to hadd all output trees.
 
 ### job-script.sh 
-Sets up a single job. This will be run by each individual farm node. It sets up the environment using modules, copies the code from the source repository onto the farm node then runs the maketree code.
+Sets up a single job. This will be run by each individual farm node. It sets up the environment using modules, copies the code from the source repository onto the farm node then runs the *maketree.cpp* code.
 
-***N.B.:*** Please test job-script.sh before launching swif jobs. To emulate a job on a farm node, create a new directory and test job-script.sh from there using:
+***N.B.:*** Please test *job-script.sh* before launching swif jobs. To emulate a job on a farm node, create a new directory and test *job-script.sh* from there using:
 
       /path/to/job-script.sh /path/to/source/code/eed /path/to/data_runnb.hipo runnb config.data treename
 
@@ -67,13 +68,14 @@ Creates and submits the swif jobs. Three things should be modified in the script
 
 On line 3 the SRCDIR variable should contain the path to the source code. 
 
+On line 19, change the farm account to your farm account. This should be clas12 or clas or other. See [documentation here](https://scicomp.jlab.org/scicomp/slurmJob/slurmAccount) or [here](https://jlab.servicenowservices.com/kb_view.do?sys_kb_id=b022cd801b35c110a888ea4ce54bcb18).
+
 On line 5, CONFIG_FILE_FO should contain the path to a config file used to setup the swif submission.
-This config file must have three entries. OutPath which is the path to the output directory. Note that there will be as many output trees as there are jobs.
+This config file must have five entries. OutPath which is the path to the output directory. Note that there will be as many output trees as there are jobs.
 RunLists which are files containing the path to the hipo data files and run numbers. You can look at eg spring2019.txt as an example. For convenience there already are three run lists corresponding to the three RG-B datasets.
 treename which is how the swif workflow and output files will be named, this can be the same as the tree name in the clas12root script.
+RCDBPath and CCDBPath should point to the location of your local copies of the RCDB and CCDB databases.
 Note that this config file can be the same as the one read by the *maketree.cpp* clas12root script as in the example config file provided in this repository.
-
-The third thing to change is the farm account on line 19, this should be clas12 or clas or other. See [documentation here](https://jlab.servicenowservices.com/kb_view.do?sys_kb_id=b022cd801b35c110a888ea4ce54bcb18).
 
 The submission script will copy the database files from the path specified in the config file to the source code directory. This is so the job-script copies these files to the farm nodes to avoid reading from /work too many times. 
 
