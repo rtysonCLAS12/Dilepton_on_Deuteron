@@ -20,7 +20,7 @@ rm rcdb.root
 rm ccdb.sqlite
 
 echo
-echo "hadd *.root from: $ROOT_DIR"
+echo "hadd -f *.root from: $ROOT_DIR"
 echo "Output File: $OUTPUT_FILE"
 
 # Initialize an empty file list
