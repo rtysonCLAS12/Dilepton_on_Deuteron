@@ -22,11 +22,11 @@ void plotVars(){
   gStyle->SetOptStat("");
   gStyle->SetOptFit(0012);
 
-  string fileLoc = "";
+  string fileLoc = "/w/work/clas12/tyson/plots/c12_scripts/eed/IM/";
 
-  string treeLocRoot = "eedFS_allRGB.root";
+  string treeLocRoot = "/w/work/clas12/tyson/data_repo/c12scripts_out/eed/eedFS_allRGB.root";
 
-  string endName="_test"; //_noCuts
+  string endName="_allRGB"; //_noCuts
 
   auto file = new TFile((treeLocRoot).c_str());
   //auto output =(TTree*) file->Get("FINALOUTTREE");
@@ -38,6 +38,7 @@ void plotVars(){
 
   cut+="abs(elStatus)>=2000 && abs(elStatus)<4000 && abs(poStatus)>=2000 && abs(poStatus)<4000";
   cut+="&& Q2<5 && abs(MM2)<1";
+  cut+="&& deutChi2PID<5";
 
   string cutFD="&& abs(deutStatus)>=2000 && abs(deutStatus)<4000";
   string cutCD="&& abs(deutStatus)>=4000";
@@ -45,8 +46,9 @@ void plotVars(){
   string cut_tighter=cut;
   cut_tighter+="&& elTriangCut==1 && poTriangCut==1"; //e+ e- ID
   cut_tighter+="&& Combis==0";
+  
  
-  string cutIM=cut_tighter+"&& abs(MM2)<1. && Q2<0.7";
+  string cutIM=cut_tighter+"&& abs(MM2)<1. && Q2<1.0";
 
   TF1* f2 = new TF1("Polynomial Background and Gaussian Signal2","[0]*0.398942*0.0333*TMath::Exp(-0.5*((x-[1])/([2]))*((x-[1])/([2])))/TMath::Abs([2]) -[3]*(x-[1]) - [4]*(x-[1])*(x-[1]) - [5]*(x-[1])*(x-[1])*(x-[1]) + [6]");
   f2->SetParameters(1, 3.097, 1, 1, 1,1,1);
@@ -206,11 +208,18 @@ void plotVars(){
   cpoPCALSFECinSF.Draw();
   cpoPCALSFECinSF.SaveAs((fileLoc+"Vars"+endName+".pdf").c_str());
 
+  TF1* deutMass = new TF1("deutMass","x/sqrt(x*x+1.875612*1.875612)");
+  deutMass->SetLineColor(kBlack);
+  deutMass->SetLineWidth(2);
+  deutMass->SetLineStyle(9);
+  deutMass->SetRange(0,5.0);
+
   TCanvas cdeutBetaP;
   TH2F *hdeutBetaP=new TH2F("hdeutBetaP","d #beta vs P",100,0.,5.0,100,0.,1.0);
   hdeutBetaP->GetXaxis()->SetTitle("P [GeV]");
   hdeutBetaP->GetYaxis()->SetTitle("#beta");
   output->Draw("deutBeta:deutP>>hdeutBetaP",cut.c_str(),"colz");
+  deutMass->Draw("same");
   cdeutBetaP.Draw();
   cdeutBetaP.SaveAs((fileLoc+"Vars"+endName+".pdf)").c_str());
 
