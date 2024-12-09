@@ -5,7 +5,8 @@ GoldenRuns 1
 
 #for swif submission
 OutPath /w/work/clas12/tyson/data_repo/c12scripts_out/eed/trees
-RunLists spring2019_test.txt fall2019_test.txt spring2020_test.txt
+RunLists spring2019.txt fall2019.txt spring2020.txt
+Script maketree.cpp
 
-#for concat_runs
+#for concat_run
 OutputFile /w/work/clas12/tyson/data_repo/c12scripts_out/eed/eedFS_allRGB.root

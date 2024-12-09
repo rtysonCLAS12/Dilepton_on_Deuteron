@@ -53,6 +53,11 @@ echo
 echo "-- Copy your software to $PWD on the local node -------------------------------"
 rsync -avP --exclude "output/" --exclude ".git*" "${SRCDIR}/" "$PWD"  # don't copy output/ dir or git stuff
 
+SCRIPT=$(grep '^Script' "$CONFIGFILE" | cut -d' ' -f2-)
+
+echo $CONFIGFILE
+echo "$SCRIPT"
+
 echo
 echo "-- Run main job -----------------------------------"
 set +e   # we'll disable 'killing the shell on errors' from here on
@@ -63,8 +68,8 @@ set +e   # we'll disable 'killing the shell on errors' from here on
 
 OUTPUTFILE="${TREENM}_${RUNNB}.root"
 LOGFILE="${TREENM}_${RUNNB}.log"
-clas12root -b 'maketree.cpp("'${FILEPATH}'", "'${CONFIGFILE}'", "'${OUTPUTFILE}'")' > "${LOGFILE}"
-
+#clas12root -b 'maketree_dilepinCD.cpp("'${FILEPATH}'", "'${CONFIGFILE}'", "'${OUTPUTFILE}'")' > "${LOGFILE}"
+clas12root -b "${SCRIPT}(\"${FILEPATH}\", \"${CONFIGFILE}\", \"${OUTPUTFILE}\")" > "${LOGFILE}"
 
 echo
 echo "-- List Working Directory (END OF JOB) ---------------------------------------------"

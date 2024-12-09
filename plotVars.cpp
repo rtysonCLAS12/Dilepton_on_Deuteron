@@ -22,7 +22,7 @@ void plotVars(){
   gStyle->SetOptStat("");
   gStyle->SetOptFit(0012);
 
-  string fileLoc = "";
+  string fileLoc = "/w/work/clas12/tyson/plots/c12_scripts/eed/IM/";
 
   string treeLocRoot = "/w/work/clas12/tyson/data_repo/c12scripts_out/eed/eedFS_allRGB.root";
 
