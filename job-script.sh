@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /home/tyson/.bashrc
+source .bashrc
 
 ## Test command and ensure job-script was called with the runnb arg we want
 if [ $# != 5 ]; then
