@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source .bashrc
-
 ## Test command and ensure job-script was called with the runnb arg we want
 if [ $# != 5 ]; then
   echo "Wrong number of arguments"
@@ -15,6 +13,18 @@ FILEPATH=$2
 RUNNB=$3
 CONFIGFILE=$4
 TREENM=$5
+
+
+if [[ "$PWD" == *"/home/"* ]]; then
+  echo "Job working dir ($PWD) is under /home.  You probably don't want this.  Exitting..."
+  exit 1
+fi
+
+echo
+echo "-- Copy your software to $PWD on the local node -------------------------------"
+rsync -avP --exclude "output/" --exclude ".git*" "${SRCDIR}/" "$PWD"  # don't copy output/ dir or git stuff
+
+source  .bashrc
 
 #to test this script, create new directory somewhere other than source code
 #this mimics copying working directory to farm node
@@ -44,14 +54,6 @@ export  CX=/usr/bin/g++
 
 export PATH="$PATH":"$CLAS12ROOT/bin"
 
-if [[ "$PWD" == *"/home/"* ]]; then
-  echo "Job working dir ($PWD) is under /home.  You probably don't want this.  Exitting..."
-  exit 1
-fi
-
-echo
-echo "-- Copy your software to $PWD on the local node -------------------------------"
-rsync -avP --exclude "output/" --exclude ".git*" "${SRCDIR}/" "$PWD"  # don't copy output/ dir or git stuff
 
 SCRIPT=$(grep '^Script' "$CONFIGFILE" | cut -d' ' -f2-)
 
@@ -68,7 +70,8 @@ set +e   # we'll disable 'killing the shell on errors' from here on
 
 OUTPUTFILE="${TREENM}_${RUNNB}.root"
 LOGFILE="${TREENM}_${RUNNB}.log"
-#clas12root -b 'maketree_dilepinCD.cpp("'${FILEPATH}'", "'${CONFIGFILE}'", "'${OUTPUTFILE}'")' > "${LOGFILE}"
+#clas12root -b 'maketree.cpp("'${FILEPATH}'", "'${CONFIGFILE}'", "'${OUTPUTFILE}'")' > "${LOGFILE}"
+#echo clas12root -b "${SCRIPT}(\"${FILEPATH}\", \"${CONFIGFILE}\", \"${OUTPUTFILE}\")" > "${LOGFILE}"
 clas12root -b "${SCRIPT}(\"${FILEPATH}\", \"${CONFIGFILE}\", \"${OUTPUTFILE}\")" > "${LOGFILE}"
 
 echo
