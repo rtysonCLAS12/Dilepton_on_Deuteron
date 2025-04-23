@@ -154,11 +154,11 @@ void maketree_dilepinCD(string dataPath, string configFileName, string outLoc){
         clas12databases c12db;
         c12.connectDataBases(&c12db);
         auto& rcdbData= c12.rcdb()->current();
-        //only golden files
-        if(useGoldenRunsOnly==1){
-          c12.db()->qadb_requireGolden(true);
-        }
-        c12.applyQA();
+        //c12.applyQA("pass1");
+        ////only golden files
+        //if(useGoldenRunsOnly==1){
+        //  c12.db()->qadb_requireGolden(true);
+        //}
 
         const TableOfDoubles_t& ccdbPhSF=c12.ccdb()->requestTableDoubles("/calibration/eb/photon_sf");
 
@@ -377,7 +377,7 @@ void maketree_dilepinCD(string dataPath, string configFileName, string outLoc){
               }//iterate over electrons   
               counter++;
             }//at least 1 electron 1 positron 1 deuteron
-            accCharge+=c12.db()->qa()->getAccCharge();
+            //accCharge+=c12.db()->qa()->getAccCharge();
         }//while read file
 
    }//loop over files
