@@ -33,11 +33,11 @@ module load sqlite/5.10
 
 #clas12root stuff
 
-module load clas12root/1.8.4
-export CLAS12ROOT=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.4/4.1.0/
-export ROOT_INCLUDE_PATH=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.4/4.1.0/hipo4:${ROOT_INCLUDE_PATH}
-export ROOT_INCLUDE_PATH=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.4/4.1.0/Clas12Banks:${ROOT_INCLUDE_PATH}
-export ROOT_INCLUDE_PATH=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.4/4.1.0/Clas12Root:${ROOT_INCLUDE_PATH}
+module load clas12root/1.8.5
+export CLAS12ROOT=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.5/4.2.0/
+export ROOT_INCLUDE_PATH=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.5/4.2.0/hipo4:${ROOT_INCLUDE_PATH}
+export ROOT_INCLUDE_PATH=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.5/4.2.0/Clas12Banks:${ROOT_INCLUDE_PATH}
+export ROOT_INCLUDE_PATH=/u/scigroup/cvmfs/hallb/clas12/sw/almalinux9-gcc11/local/clas12root/1.8.5/4.2.0/Clas12Root:${ROOT_INCLUDE_PATH}
 
 export  CC=/usr/bin/gcc
 export  CX=/usr/bin/g++
